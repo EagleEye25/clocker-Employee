@@ -4,21 +4,6 @@
   </div>
 </template>
 
-<script>
-import settings from '../public/settings/settings.json'
-export default {
-  beforeMount() {
-    if (settings.applicationType === 'management') {
-      this.$router.push('/login');
-    } else if (settings.applicationType === 'clocker') {
-      this.$router.push('/clocker')
-    } else {
-      this.$router.push('/')
-    }
-  }
-}
-</script>
-
 <style lang="scss">
 @import 'vue-awesome-notifications/dist/styles/style.scss';
   #app {
