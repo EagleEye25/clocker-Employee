@@ -1,0 +1,159 @@
+{
+  "name": "clocker",
+  "version": "0.1.0",
+  "private": true,
+  "main": "electron.js",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "electron": "yarn build && electron .",
+    "package:mac": "yarn build && electron-builder -m",
+    "package:linux": "yarn build && electron-builder -l",
+    "package:win": "yarn build && electron-builder --win --x64"
+  },
+  "dependencies": {
+    "apexcharts": "^3.8.2",
+    "axios": "^0.19.0",
+    "core-js": "^2.6.5",
+    "vue": "^2.6.10",
+    "vue-apexcharts": "^1.4.0",
+    "vue-awesome-notifications": "^3.0.3",
+    "vue-ctk-date-time-picker": "^2.1.1",
+    "vue-material": "^1.0.0-beta-11",
+    "vue-router": "^3.0.3",
+    "vue-tour": "^1.1.0",
+    "vuelidate": "^0.7.4",
+    "vuex": "^3.1.1"
+  },
+  "devDependencies": {
+    "electron": "^5.0.6",
+    "tslint": "^5.18.0",
+    "@vue/cli-plugin-babel": "^3.8.0",
+    "@vue/cli-plugin-eslint": "^3.8.0",
+    "@vue/cli-service": "^3.8.0",
+    "babel-eslint": "^10.0.1",
+    "electron-builder": "^21.0.15",
+    "eslint": "^5.16.0",
+    "eslint-plugin-vue": "^5.0.0",
+    "node-sass": "^4.12.0",
+    "sass-loader": "^7.1.0",
+    "vue-template-compiler": "^2.6.10"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "rules": {},
+    "parserOptions": {
+      "parser": "babel-eslint"
+    }
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ],
+
+  "productName": "Clocker",
+    "build": {
+      "electronVersion": "5.0.4",
+      "appId": "clocker",
+      "npmRebuild": true,
+      "directories": {
+        "buildResources": "resources",
+        "output": "packages"
+      },
+      "files": [
+        "main.js",
+        "preload.js",
+        "modules/**",
+        "dist/**",
+        "resources/**",
+        "!node_modules/electron/**/*",
+        "!node_modules/**/sqlite3*.node",
+        "node_modules/**/electron-v1.7-*/*.node"
+      ],
+      "win": {
+        "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+        "target": [
+          {
+            "target": "nsis",
+            "arch": [
+              "x64",
+              "ia32"
+            ]
+          },
+          {
+            "target": "zip",
+            "arch": [
+              "x64",
+              "ia32"
+            ]
+          }
+        ]
+      },
+      "nsis": {
+        "oneClick": false,
+        "allowToChangeInstallationDirectory": true,
+        "installerIcon": "resources/icon.ico",
+        "installerHeaderIcon": "resources/icon.ico",
+        "uninstallerIcon": "resources/icon.ico",
+        "createDesktopShortcut": "always",
+        "createStartMenuShortcut": true,
+        "menuCategory": "Clocker",
+        "runAfterFinish": true
+      },
+      "linux": {
+        "maintainer": "EagleEye25",
+        "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
+        "target": [
+          {
+            "target": "deb",
+            "arch": [
+              "x64"
+            ]
+          },
+          {
+            "target": "rpm",
+            "arch": [
+              "x64"
+            ]
+          },
+          {
+            "target": "zip",
+            "arch": [
+              "x64"
+            ]
+          }
+        ],
+        "executableName": "Clocker",
+        "desktop": {
+          "Comment": "Keeping track so you dont have to!",
+          "Icon": "particl-desktop",
+          "Name": "Clocker",
+          "StartupNotify": "true",
+          "Terminal": "false",
+          "Type": "Application",
+          "Categories": "Security;Reports"
+        },
+        "category": "Finance",
+        "packageCategory": "wallet",
+        "icon": "resources/linux"
+      },
+      "asar": true,
+      "asarUnpack": [
+        "node_modules/sqlite3/**/*",
+        "node_modules/particl-marketplace/**/*"
+      ]
+    }
+}
