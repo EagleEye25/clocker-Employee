@@ -4,11 +4,11 @@
     <div v-if="action === 'Clock_In' || action === null || action === 'completed'">
       <img class="center" src="../../public/pictures/lock.png" alt="Lock Image">
       <!-- Hides input off screen -->
-      <div class="outer">
-        <div class="inner">
+      <!-- <div class="outer"> -->
+        <!-- <div class="inner"> -->
           <input v-focus v-model="tag" type="text" @keyup.enter="onEnter" id="cardInput">
-        </div>
-      </div>
+        <!-- </div> -->
+      <!-- </div> -->
       <h1 style="color:white;">{{ message }}</h1>
     </div>
     <div v-if="action === 'Clock_Out'" class="center">
@@ -33,11 +33,26 @@
       :md-content=dialogMsg
       md-confirm-text=""
     />
+    <div>
+      <md-dialog-prompt
+        :md-active.sync="active"
+        md-title="Change Server Address"
+        md-input-placeholder="Server Address"
+        v-model="serverAddy"
+        md-confirm-text="Change"
+        md-cancel-text="Cancel"
+        @md-confirm="onConfirm" />
+
+      <md-button @click="active = true, serverAddy = null">
+        <md-icon>settings</md-icon>
+      </md-button>
+    </div>
   </div>
 </template>
 
 <script>
-  import http from '../../public/app.service.ts'
+  import http from '../../public/app.service.ts';
+  import axios from 'axios';
 
   export default {
     name: 'clocker',
@@ -57,16 +72,30 @@
         inProcessing: false,
         showDialogD: false,
         dialogMsg: '',
+        active: false,
+        serverAddy: null,
       }
     },
 
     methods: {
+      async onConfirm() {
+        return await this.$awn.asyncBlock(axios.get(`${this.serverAddy}/app/test/`)
+          .then((result) => {
+            this.$awn.success('Valid Server Connection!');
+            window.localStorage.setItem('serverAddy', this.serverAddy);
+            return true
+          }).catch((err) => {
+            this.$awn.alert('Invalid Server Connection!');
+            return false
+          }), null, null);
+      },
+
       onEnter() {
         this.determineAction();
       },
 
       clockIn(resp) {
-        http.post(`/api/clocking/clock_in`, {
+        http.post(`/app/clocking/clock_in`, {
           'employee_id': resp.employee_id,
           'reason_id': null,
           'clock_in': Date.now(),
@@ -86,7 +115,7 @@
       },
 
       clockOut(resp, reasonID) {
-        http.put(`/api/clocking/clock_out/${resp.id}`, {
+        http.put(`/app/clocking/clock_out/${resp.id}`, {
         'id': resp.id,
         'employee_id': resp.employee_id,
         'reason_id': reasonID,
@@ -134,8 +163,9 @@
 
       determineAction() {
       // Determine if backend should clock in or out employee
-      http.get(`/api/clocking/determineAction/${this.tag}`)
+      http.get(`/app/clocking/determineAction/${this.tag}`)
         .then((res) =>{
+          console.log(res);
           if (res.status === 200 && res.data) {
             this.action = res.data.action;
             this.response = res.data;
@@ -151,6 +181,7 @@
             }
           }
         }).catch(e => {
+          console.log('here', e);
           let error = e.toString().indexOf('Network Error');
           if (error) {
             this.showDialog('NetworkError');
@@ -168,6 +199,7 @@
       },
 
       showDialog(type) {
+        this.tag = null;
         switch(type) {
           case 'InSuccess': {
             this.dialogMsg = 'Successfully Clocked In!'

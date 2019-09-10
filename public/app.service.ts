@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-const instance = axios.create({
-  baseURL: 'http://localhost:3000/'
-});
+const serverAddy = window.localStorage.getItem('serverAddy');
 
+const params = {
+  baseURL: serverAddy
+};
+const instance = axios.create(params);
 export default instance;
