@@ -20,7 +20,6 @@
       </md-table-toolbar>
 
       <md-table-row slot="md-table-row" slot-scope="{ item }" md-selectable="single">
-        <md-table-cell md-label="Number" md-sort-by="id" md-numeric>{{ item.id }}</md-table-cell>
         <md-table-cell md-label="Description" md-sort-by="description">{{ item.description }}</md-table-cell>
         <md-table-cell md-label="Work Related" md-sort-by="workW">{{ item.workW }}</md-table-cell>
       </md-table-row>
@@ -116,26 +115,25 @@
 
       clockOut(resp, reasonID) {
         http.put(`/app/clocking/clock_out/${resp.id}`, {
-        'id': resp.id,
-        'employee_id': resp.employee_id,
-        'reason_id': reasonID,
-        'clock_in': resp.clock_in,
-        'clock_out': Date.now(),
-        'overtime': null
-      })
-      .then(() => {
-        this.action = 'completed'
-        this.showDialog('OutSuccess');
-        this.tag = '';
-      }).catch(() => {
-        this.showDialog('InFail');
-      });
+          'id': resp.id,
+          'employee_id': resp.employee_id,
+          'reason_id': reasonID,
+          'clock_in': resp.clock_in,
+          'clock_out': Date.now(),
+          'overtime': null
+        }).then(() => {
+          this.action = 'completed'
+          this.showDialog('OutSuccess');
+          this.tag = '';
+        }).catch((err) => {
+          this.showDialog('InFail');
+        });
       },
 
       getReasons() {
-        http.get(`/api/reason/`)
-        .then((res) => {
-          res.data.forEach(d => {
+        this.reasons = [];
+        http.get(`/app/openReasons/`).then((res) => {
+          res.data.found.forEach(d => {
             let bool = 'no';
             if (d.work !== 0) {
               bool = 'yes'
@@ -148,7 +146,6 @@
             }
             this.reasons.push(data);
           });
-          this.reasons.toString();
         }).catch(() => {
 
         });
@@ -165,8 +162,7 @@
       // Determine if backend should clock in or out employee
       http.get(`/app/clocking/determineAction/${this.tag}`)
         .then((res) =>{
-          console.log(res);
-          if (res.status === 200 && res.data) {
+          if (res.status === 200 && res.data && res.data.id) {
             this.action = res.data.action;
             this.response = res.data;
             switch(this.action) {
@@ -179,9 +175,10 @@
                 break;
               }
             }
+          } else {
+            this.tag = null;
           }
         }).catch(e => {
-          console.log('here', e);
           let error = e.toString().indexOf('Network Error');
           if (error) {
             this.showDialog('NetworkError');
