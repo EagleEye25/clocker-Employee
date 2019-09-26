@@ -162,7 +162,7 @@
       // Determine if backend should clock in or out employee
       http.get(`/app/clocking/determineAction/${this.tag}`)
         .then((res) =>{
-          if (res.status === 200 && res.data && res.data.id) {
+          if (res.status === 200 && res.data && res.data.employee_id) {
             this.action = res.data.action;
             this.response = res.data;
             switch(this.action) {
